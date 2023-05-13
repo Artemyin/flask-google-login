@@ -1,0 +1,18 @@
+[project]
+name = "flask-google-login"
+version = "0.1.0"
+description = "Add a short description here"
+authors = [
+    { name = "Artemii", email = "artemyin@gmail.com" }
+]
+dependencies = ["flask~=2.3.2", "requests~=2.30.0", "oauthlib~=3.2.2", "pyOpenSSL~=23.1.1", "Flask-Login~=0.6.2"]
+readme = "README.md"
+requires-python = ">= 3.8"
+license = { text = "MIT" }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
