@@ -8,3 +8,5 @@ wheels/
 
 # venv
 .venv
+sqlite_db
+.vscode/launch.json
