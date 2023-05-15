@@ -22,12 +22,15 @@ from user import User
 
 
 # configuration
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_CLIENT_ID = "8546975421-1bgenrmiq8h1qfr147kiila96fomttld.apps.googleusercontent.com" 
+# os.environ.get("GOOGLE_CLIENT_ID", None)
+GOOGLE_CLIENT_SECRET = "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" 
+# os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
 
+print(f"{GOOGLE_CLIENT_ID},\n {GOOGLE_CLIENT_SECRET},\n {GOOGLE_DISCOVERY_URL}\n")
 
 # Flask app setup
 app = Flask(__name__)
@@ -46,7 +49,7 @@ except sqlite3.OperationalError:
     pass
 
 # OAuth 2 client setup
-client = WebApplicationClient(GOOGLE_CLIENT_SECRET)
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
 # Flask-login helper to retrieve a user from our db
@@ -107,7 +110,7 @@ def callback():
         redirect_url=request.base_url,
         code=code
     )
-    token_response = request.post(
+    token_response = requests.post(
         token_url,
         headers=headers,
         data=body,
@@ -122,7 +125,7 @@ def callback():
     # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = request.get(uri, headers=headers, data=body)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
 
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
@@ -142,8 +145,9 @@ def callback():
     )
 
     # Doesn't exist? Add it to the database.
-    if not User.get(unique_id):
-        User.create(unique_id)
+    user_existance = User.get(unique_id)
+    if not user_existance:
+        User.create(unique_id, users_name, users_email, picture)
 
     # Begin user session by logging the user in
     login_user(user)
