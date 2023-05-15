@@ -55,7 +55,7 @@ def load_user(user_id):
     return User.get(user_id)
 
 
-@app.route("/"):
+@app.route("/")
 def index():
     if current_user.is_authenticated:
         return (
@@ -64,6 +64,7 @@ def index():
             '<img src="{}" alt="Google profile pic"></img></div>'
             '<a class="button" href="/logout">Logout</a>'.format(
                 current_user.name, current_user.email, current_user.profile_pic
+            )
         )
     else:
         return '<a class="button" href="/login">Google Login</a>'
@@ -93,12 +94,11 @@ def login():
 def callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
-    
+
     # Find out what URL to hit to get tokens that allow you to ask for
     # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
-
 
     # Prepare and send a request to get tokens! Yay tokens!
     token_url, headers, body = client.prepare_token_request(
@@ -124,7 +124,6 @@ def callback():
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = request.get(uri, headers=headers, data=body)
 
-
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
     # app, and now you,ve verified their email through Google!
@@ -136,7 +135,7 @@ def callback():
     else:
         return "User email not available or not verified by Google.", 400
 
-    # Create a user in your db with the information provided 
+    # Create a user in your db with the information provided
     # by Google
     user = User(
         id_=unique_id, name=users_name, email=users_email, profile_pic=picture
@@ -153,3 +152,12 @@ def callback():
     return redirect(url_for("index"))
 
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+
+
+if __name__ == "__main__":
+    app.run(ssl_context="adhoc")
